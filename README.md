@@ -31,9 +31,27 @@ pnpm test
 - `SERVICE_NAME` (default `saltchat`)
 - `SERVICE_SECRET` (required; shared only by SaltHub backend and SaltChat)
 - `ALLOWED_ORIGINS` (comma-separated browser origins; empty means no browser origins)
-- `AI_PROVIDER` (`mock` or `openai`, default `mock`)
-- `OPENAI_API_KEY` (required only for `AI_PROVIDER=openai`)
-- `OPENAI_MODEL` (optional, default `gpt-4o-mini`)
+- `AI_PROVIDER` (`mock`, `openai`, `claude`, or `openai-compatible`; default `mock`)
+- `AI_API_KEY` (required when `AI_PROVIDER` is not `mock`)
+- `AI_MODEL` (optional; defaults to `gpt-4o-mini`, or `claude-sonnet-4-5` for Claude)
+- `AI_BASE_URL` (optional; used by OpenAI-compatible providers, default `https://api.openai.com/v1`)
+
+Provider credentials and request formatting stay inside provider adapters. For example, Claude can be selected with:
+
+```env
+AI_PROVIDER=claude
+AI_API_KEY=your-anthropic-api-key
+AI_MODEL=claude-sonnet-4-5
+```
+
+For OpenAI-compatible services such as a gateway or self-hosted endpoint:
+
+```env
+AI_PROVIDER=openai-compatible
+AI_API_KEY=your-api-key
+AI_BASE_URL=https://your-provider.example/v1
+AI_MODEL=your-model
+```
 
 ## API
 

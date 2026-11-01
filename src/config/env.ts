@@ -5,9 +5,13 @@ const envSchema = z.object({
   SERVICE_NAME: z.string().trim().min(1).default('saltchat'),
   SERVICE_SECRET: z.string().min(1, 'SERVICE_SECRET is required'),
   ALLOWED_ORIGINS: z.string().default(''),
-  AI_PROVIDER: z.enum(['mock', 'openai']).default('mock'),
+  AI_PROVIDER: z.enum(['mock', 'openai', 'claude', 'openai-compatible']).default('mock'),
+  AI_API_KEY: z.string().optional(),
+  AI_MODEL: z.string().optional(),
+  AI_BASE_URL: z.string().url().optional(),
+  // Backward-compatible OpenAI settings. New deployments should use AI_*.
   OPENAI_API_KEY: z.string().optional(),
-  OPENAI_MODEL: z.string().default('gpt-4o-mini'),
+  OPENAI_MODEL: z.string().optional(),
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
 });
 
@@ -16,9 +20,14 @@ export type AppConfig = {
   serviceName: string;
   serviceSecret: string;
   allowedOrigins: string[];
-  aiProvider: 'mock' | 'openai';
+  aiProvider: 'mock' | 'openai' | 'claude' | 'openai-compatible';
+  aiApiKey?: string;
+  aiModel?: string;
+  aiBaseUrl?: string;
+  /** @deprecated Use aiApiKey and aiModel. */
   openAiApiKey?: string;
-  openAiModel: string;
+  /** @deprecated Use aiModel. */
+  openAiModel?: string;
   nodeEnv: 'development' | 'test' | 'production';
 };
 
@@ -30,8 +39,11 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
     serviceSecret: parsed.SERVICE_SECRET,
     allowedOrigins: parsed.ALLOWED_ORIGINS.split(',').map((origin) => origin.trim()).filter(Boolean),
     aiProvider: parsed.AI_PROVIDER,
-    openAiApiKey: parsed.OPENAI_API_KEY,
-    openAiModel: parsed.OPENAI_MODEL,
+    aiApiKey: parsed.AI_API_KEY || parsed.OPENAI_API_KEY,
+    aiModel: parsed.AI_MODEL || parsed.OPENAI_MODEL || 'gpt-4o-mini',
+    aiBaseUrl: parsed.AI_BASE_URL,
+    openAiApiKey: parsed.AI_API_KEY || parsed.OPENAI_API_KEY,
+    openAiModel: parsed.AI_MODEL || parsed.OPENAI_MODEL || 'gpt-4o-mini',
     nodeEnv: parsed.NODE_ENV,
   };
 }
