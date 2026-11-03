@@ -1,6 +1,13 @@
+export interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
 export interface ChatProviderInput {
   message: string;
+  model: string;
   conversationId: string | null;
+  messages: ChatMessage[];
   context?: Record<string, unknown>;
   user: {
     id: string;
@@ -15,4 +22,5 @@ export interface ChatProviderInput {
 export interface ChatProviderResponse {
   message: string;
   conversationId: string | null;
+  messages: ChatMessage[];
 }

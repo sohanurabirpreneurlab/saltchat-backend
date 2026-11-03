@@ -14,9 +14,15 @@ export function createChatController(service: ChatService): RequestHandler {
       return;
     }
     try {
+      if (!service.supportsModel(input.model)) {
+        res.status(400).json({ error: { code: 'VALIDATION_ERROR', message: 'Unsupported model', request_id: res.locals.requestId } });
+        return;
+      }
       const result = await service.generateResponse({
         message: input.message,
+        model: input.model,
         conversationId: input.conversation_id ?? null,
+        messages: input.messages,
         context: input.context,
         user: {
           id: input.user.id,
@@ -27,7 +33,7 @@ export function createChatController(service: ChatService): RequestHandler {
           clientIds: input.user.client_ids,
         },
       });
-      res.json({ message: result.message, conversation_id: result.conversationId });
+      res.json({ message: result.message, conversation_id: result.conversationId, messages: result.messages });
     } catch (error) {
       next(error instanceof ZodError
         ? error

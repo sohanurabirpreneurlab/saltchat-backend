@@ -3,9 +3,11 @@ import type { ChatProviderInput, ChatProviderResponse } from '../types/chat.type
 
 export class MockProvider implements AiProvider {
   async generateResponse(input: ChatProviderInput): Promise<ChatProviderResponse> {
+    const message = `Mock response for: ${input.message}`;
     return {
-      message: `Mock response for: ${input.message}`,
+      message,
       conversationId: input.conversationId,
+      messages: [...input.messages, { role: 'user', content: input.message }, { role: 'assistant', content: message }],
     };
   }
 }

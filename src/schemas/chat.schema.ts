@@ -9,9 +9,16 @@ const userSchema = z.object({
   client_ids: z.array(z.string().trim().min(1)).optional(),
 }).strict();
 
+const messageSchema = z.object({
+  role: z.enum(['user', 'assistant']),
+  content: z.string().trim().min(1).max(16000),
+}).strict();
+
 export const chatRequestSchema = z.object({
   message: z.string().trim().min(1).max(8000),
+  model: z.string().trim().min(1).max(100),
   conversation_id: z.string().trim().min(1).nullable().optional(),
+  messages: z.array(messageSchema).max(100).optional().default([]),
   context: z.record(z.unknown()).optional(),
   user: userSchema,
 }).strict();

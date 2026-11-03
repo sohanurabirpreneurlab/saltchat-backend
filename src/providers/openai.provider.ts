@@ -26,6 +26,10 @@ export class OpenAIProvider implements AiProvider {
     const data = await response.json() as { choices?: Array<{ message?: { content?: string } }> };
     const message = data.choices?.[0]?.message?.content;
     if (!message) throw new Error('OpenAI returned an empty response');
-    return { message, conversationId: input.conversationId };
+    return {
+      message,
+      conversationId: input.conversationId,
+      messages: [...input.messages, { role: 'user', content: input.message }, { role: 'assistant', content: message }],
+    };
   }
 }

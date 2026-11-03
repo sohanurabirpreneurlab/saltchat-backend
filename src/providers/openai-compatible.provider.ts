@@ -12,7 +12,7 @@ export class OpenAICompatibleProvider implements AiProvider {
     const response = await fetch(`${this.baseUrl.replace(/\/$/, '')}/chat/completions`, {
       method: 'POST',
       headers: { 'content-type': 'application/json', authorization: `Bearer ${this.apiKey}` },
-      body: JSON.stringify({ model: this.model, messages: [{ role: 'user', content: input.message }] }),
+      body: JSON.stringify({ model: this.model, messages: [...input.messages, { role: 'user', content: input.message }] }),
     });
     if (!response.ok) {
       let providerMessage = response.statusText || 'request failed';
@@ -25,6 +25,10 @@ export class OpenAICompatibleProvider implements AiProvider {
     const data = await response.json() as { choices?: Array<{ message?: { content?: string } }> };
     const message = data.choices?.[0]?.message?.content;
     if (!message) throw new Error('AI provider returned an empty response');
-    return { message, conversationId: input.conversationId };
+    return {
+      message,
+      conversationId: input.conversationId,
+      messages: [...input.messages, { role: 'user', content: input.message }, { role: 'assistant', content: message }],
+    };
   }
 }

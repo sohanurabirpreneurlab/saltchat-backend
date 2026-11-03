@@ -16,7 +16,7 @@ export function createApp(config: AppConfig, provider = createProvider(config)) 
   app.use(cors({ origin: config.allowedOrigins.length ? config.allowedOrigins : false, credentials: false }));
   app.use(express.json({ limit: '256kb' }));
   app.use(healthRoutes(config));
-  app.use('/api', chatRoutes(config, new ChatService(provider)));
+  app.use('/api', chatRoutes(config, new ChatService(provider, config.allowedModelProviders)));
   app.use(errorMiddleware);
   return app;
 }

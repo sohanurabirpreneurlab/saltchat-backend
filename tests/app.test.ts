@@ -11,12 +11,17 @@ const config: AppConfig = {
   allowedOrigins: ['https://salt.example'],
   aiProvider: 'mock',
   openAiModel: 'gpt-4o-mini',
+  primaryBundleId: 'generic',
+  allowedModelProviders: ['gemini', 'claude'],
+  fallbackModel: 'claude-sonnet-4-5',
   nodeEnv: 'test',
 };
 
 const validBody = {
   message: 'How do I create a quote?',
+  model: 'gemini',
   conversation_id: null,
+  messages: [],
   context: { page: '/dashboard' },
   user: { id: 'firebase-user-id', email: 'user@example.com', display_name: 'User Name', role: 'admin', department: 'Strategy', client_ids: [] },
 };
@@ -35,7 +40,14 @@ describe('SaltChat API', () => {
   it('accepts a valid chat request', async () => {
     const response = await request(appWithProvider()).post('/api/chat').set('X-Service-Key', config.serviceSecret).send(validBody);
     expect(response.status).toBe(200);
-    expect(response.body).toEqual({ message: 'Mock response for: How do I create a quote?', conversation_id: null });
+    expect(response.body).toEqual({
+      message: 'Mock response for: How do I create a quote?',
+      conversation_id: null,
+      messages: [
+        { role: 'user', content: 'How do I create a quote?' },
+        { role: 'assistant', content: 'Mock response for: How do I create a quote?' },
+      ],
+    });
   });
 
   it('rejects invalid chat requests with the standard validation error', async () => {

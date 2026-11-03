@@ -12,7 +12,7 @@ export class ClaudeProvider implements AiProvider {
         'x-api-key': this.apiKey,
         'anthropic-version': '2023-06-01',
       },
-      body: JSON.stringify({ model: this.model, max_tokens: 1024, messages: [{ role: 'user', content: input.message }] }),
+    body: JSON.stringify({ model: this.model, max_tokens: 1024, messages: [...input.messages, { role: 'user', content: input.message }] }),
     });
     if (!response.ok) {
       let providerMessage = response.statusText || 'request failed';
@@ -25,6 +25,10 @@ export class ClaudeProvider implements AiProvider {
     const data = await response.json() as { content?: Array<{ type?: string; text?: string }> };
     const message = data.content?.find((block) => block.type === 'text')?.text;
     if (!message) throw new Error('Claude returned an empty response');
-    return { message, conversationId: input.conversationId };
+    return {
+      message,
+      conversationId: input.conversationId,
+      messages: [...input.messages, { role: 'user', content: input.message }, { role: 'assistant', content: message }],
+    };
   }
 }

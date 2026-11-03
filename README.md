@@ -31,10 +31,14 @@ pnpm test
 - `SERVICE_NAME` (default `saltchat`)
 - `SERVICE_SECRET` (required; shared only by SaltHub backend and SaltChat)
 - `ALLOWED_ORIGINS` (comma-separated browser origins; empty means no browser origins)
-- `AI_PROVIDER` (`mock`, `openai`, `claude`, or `openai-compatible`; default `mock`)
-- `AI_API_KEY` (required when `AI_PROVIDER` is not `mock`)
+- `AI_PROVIDER` (`mock`, `primary`, `sdk`, `openai`, `claude`, or `openai-compatible`; default `mock`)
+- `AI_API_KEY` (legacy/general provider key; primary mode can use `AI_PRIMARY_API_KEY` instead)
 - `AI_MODEL` (optional; defaults to `gpt-4o-mini`, or `claude-sonnet-4-5` for Claude)
 - `AI_BASE_URL` (optional; used by OpenAI-compatible providers, default `https://api.openai.com/v1`)
+- `AI_PRIMARY_API_KEY` and `AI_PRIMARY_BASE_URL` (primary gateway credentials; fall back to `AI_API_KEY` and `AI_BASE_URL`)
+- `AI_PRIMARY_BUNDLE_ID` (optional; defaults to `generic`)
+- `AI_MODEL_PROVIDER` (comma-separated allowed primary model providers, for example `gemini,claude`)
+- `AI_FALLBACK_API_KEY` and `AI_FALLBACK_MODEL` (optional direct fallback configuration)
 
 Provider credentials and request formatting stay inside provider adapters. For example, Claude can be selected with:
 
@@ -67,7 +71,7 @@ Chat is server-only and requires the service key:
 curl -X POST http://localhost:3000/api/chat \
   -H 'Content-Type: application/json' \
   -H 'X-Service-Key: replace-with-a-long-random-server-secret' \
-  -d '{"message":"How do I create a quote?","conversation_id":null,"context":{"page":"/dashboard"},"user":{"id":"firebase-user-id","email":"user@example.com","display_name":"User Name","role":"admin","department":"Strategy","client_ids":[]}}'
+  -d '{"message":"How do I create a quote?","model":"gemini","conversation_id":null,"messages":[],"context":{"page":"/dashboard"},"user":{"id":"firebase-user-id","email":"user@example.com","display_name":"User Name","role":"admin","department":"Strategy","client_ids":[]}}'
 ```
 
 The SaltHub backend must send `X-Service-Key` and must never expose that value to the browser. It does not need to send any provider key.
