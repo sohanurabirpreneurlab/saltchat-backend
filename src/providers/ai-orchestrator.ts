@@ -13,7 +13,8 @@ export class AiOrchestrator implements AiProvider {
       return await this.primary.generateResponse(input);
     } catch (error) {
       if (!this.fallback || !isRetryableProviderError(error)) throw error;
-      return this.fallback.generateResponse(input);
+      const response = await this.fallback.generateResponse(input);
+      return { ...response, source: 'fallback' };
     }
   }
 }

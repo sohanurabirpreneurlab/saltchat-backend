@@ -23,4 +23,5 @@ export interface ChatProviderResponse {
   message: string;
   conversationId: string | null;
   messages: ChatMessage[];
+  source?: 'sdk' | 'fallback';
 }

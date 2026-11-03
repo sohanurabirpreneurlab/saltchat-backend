@@ -44,6 +44,7 @@ export class PrimaryGatewayProvider implements AiProvider {
       message: data.assistantText,
       conversationId: input.conversationId,
       messages: data.messages ?? [...input.messages, { role: 'user', content: input.message }, { role: 'assistant', content: data.assistantText }],
+      source: 'sdk',
     };
   }
 }

@@ -33,7 +33,12 @@ export function createChatController(service: ChatService): RequestHandler {
           clientIds: input.user.client_ids,
         },
       });
-      res.json({ message: result.message, conversation_id: result.conversationId, messages: result.messages });
+      res.json({
+        message: result.message,
+        conversation_id: result.conversationId,
+        messages: result.messages,
+        source: result.source,
+      });
     } catch (error) {
       next(error instanceof ZodError
         ? error
