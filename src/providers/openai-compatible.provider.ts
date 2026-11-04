@@ -1,6 +1,8 @@
 import type { AiProvider } from './ai-provider.interface';
 import type { ChatProviderInput, ChatProviderResponse } from '../types/chat.types';
 
+const LATEST_MESSAGE_INSTRUCTION = 'Answer only the latest user message. Use prior messages as context only when relevant; if the latest message is unrelated, ignore the earlier topic and answer it independently. Do not answer earlier questions again unless explicitly asked.';
+
 export class OpenAICompatibleProvider implements AiProvider {
   constructor(
     private readonly apiKey: string,
@@ -12,7 +14,14 @@ export class OpenAICompatibleProvider implements AiProvider {
     const response = await fetch(`${this.baseUrl.replace(/\/$/, '')}/chat/completions`, {
       method: 'POST',
       headers: { 'content-type': 'application/json', authorization: `Bearer ${this.apiKey}` },
-      body: JSON.stringify({ model: this.model, messages: [...input.messages, { role: 'user', content: input.message }] }),
+      body: JSON.stringify({
+        model: this.model,
+        messages: [
+          { role: 'system', content: LATEST_MESSAGE_INSTRUCTION },
+          ...input.messages,
+          { role: 'user', content: input.message },
+        ],
+      }),
     });
     if (!response.ok) {
       let providerMessage = response.statusText || 'request failed';

@@ -1,6 +1,8 @@
 import type { AiProvider } from './ai-provider.interface';
 import type { ChatProviderInput, ChatProviderResponse } from '../types/chat.types';
 
+const LATEST_MESSAGE_INSTRUCTION = 'Answer only the latest user message. Use prior messages as context only when relevant; if the latest message is unrelated, ignore the earlier topic and answer it independently. Do not answer earlier questions again unless explicitly asked.';
+
 export class ClaudeProvider implements AiProvider {
   constructor(private readonly apiKey: string, private readonly model: string) {}
 
@@ -12,7 +14,12 @@ export class ClaudeProvider implements AiProvider {
         'x-api-key': this.apiKey,
         'anthropic-version': '2023-06-01',
       },
-    body: JSON.stringify({ model: this.model, max_tokens: 1024, messages: [...input.messages, { role: 'user', content: input.message }] }),
+    body: JSON.stringify({
+      model: this.model,
+      max_tokens: 1024,
+      system: LATEST_MESSAGE_INSTRUCTION,
+      messages: [...input.messages, { role: 'user', content: input.message }],
+    }),
     });
     if (!response.ok) {
       let providerMessage = response.statusText || 'request failed';

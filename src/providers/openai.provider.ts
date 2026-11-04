@@ -1,6 +1,8 @@
 import type { AiProvider } from './ai-provider.interface';
 import type { ChatProviderInput, ChatProviderResponse } from '../types/chat.types';
 
+const LATEST_MESSAGE_INSTRUCTION = 'Answer only the latest user message. Use prior messages as context only when relevant; if the latest message is unrelated, ignore the earlier topic and answer it independently. Do not answer earlier questions again unless explicitly asked.';
+
 export class OpenAIProvider implements AiProvider {
   constructor(private readonly apiKey: string, private readonly model: string) {}
 
@@ -10,7 +12,10 @@ export class OpenAIProvider implements AiProvider {
       headers: { 'content-type': 'application/json', authorization: `Bearer ${this.apiKey}` },
       body: JSON.stringify({
         model: this.model,
-        messages: [{ role: 'user', content: input.message }],
+        messages: [
+          { role: 'system', content: LATEST_MESSAGE_INSTRUCTION },
+          { role: 'user', content: input.message },
+        ],
       }),
     });
     if (!response.ok) {

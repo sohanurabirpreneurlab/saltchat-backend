@@ -2,6 +2,13 @@ import type { AiProvider } from './ai-provider.interface';
 import { ProviderRequestError } from './provider-error';
 import type { ChatProviderInput, ChatProviderResponse } from '../types/chat.types';
 
+const LATEST_MESSAGE_INSTRUCTION = [
+  'Answer the latest user message only.',
+  'Use the conversation history only as context when it is relevant to the latest message.',
+  'If the latest message is unrelated to the history, ignore the earlier topic and answer the latest message independently.',
+  'Do not answer earlier questions again unless the latest message explicitly asks about them.',
+].join(' ');
+
 export class PrimaryGatewayProvider implements AiProvider {
   constructor(
     private readonly apiKey: string,
@@ -23,7 +30,7 @@ export class PrimaryGatewayProvider implements AiProvider {
         body: JSON.stringify({
           bundleId: this.bundleId,
           provider: input.model,
-          userMessage: input.message,
+          userMessage: `${LATEST_MESSAGE_INSTRUCTION}\n\nLatest user message:\n${input.message}`,
           messages: input.messages,
         }),
         signal: abortController.signal,
