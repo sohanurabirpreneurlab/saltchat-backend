@@ -1,5 +1,6 @@
 import type { AiProvider } from './ai-provider.interface';
 import { ProviderRequestError } from './provider-error';
+import { getRecentContext } from './conversation-context';
 import type { ChatProviderInput, ChatProviderResponse } from '../types/chat.types';
 
 const LATEST_MESSAGE_INSTRUCTION = [
@@ -31,7 +32,7 @@ export class PrimaryGatewayProvider implements AiProvider {
           bundleId: this.bundleId,
           provider: input.model,
           userMessage: `${LATEST_MESSAGE_INSTRUCTION}\n\nLatest user message:\n${input.message}`,
-          messages: input.messages,
+          messages: getRecentContext(input.messages),
         }),
         signal: abortController.signal,
       });

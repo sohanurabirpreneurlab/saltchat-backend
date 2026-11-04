@@ -1,4 +1,5 @@
 import type { AiProvider } from './ai-provider.interface';
+import { getRecentContext } from './conversation-context';
 import type { ChatProviderInput, ChatProviderResponse } from '../types/chat.types';
 
 const LATEST_MESSAGE_INSTRUCTION = 'Answer only the latest user message. Use prior messages as context only when relevant; if the latest message is unrelated, ignore the earlier topic and answer it independently. Do not answer earlier questions again unless explicitly asked.';
@@ -14,6 +15,7 @@ export class OpenAIProvider implements AiProvider {
         model: this.model,
         messages: [
           { role: 'system', content: LATEST_MESSAGE_INSTRUCTION },
+          ...getRecentContext(input.messages),
           { role: 'user', content: input.message },
         ],
       }),
