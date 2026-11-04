@@ -14,7 +14,7 @@ export class AiOrchestrator implements AiProvider {
     } catch (error) {
       if (!this.fallback || !isRetryableProviderError(error)) throw error;
       const response = await this.fallback.generateResponse(input);
-      return { ...response, source: 'fallback' };
+      return { ...response, ai: { ...response.ai, route: 'fallback' }, source: 'fallback' };
     }
   }
 }

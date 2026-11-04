@@ -1,7 +1,7 @@
 import type { AiProvider } from './ai-provider.interface';
 import { ProviderRequestError } from './provider-error';
-import { getRecentContext } from './conversation-context';
-import type { ChatProviderInput, ChatProviderResponse } from '../types/chat.types';
+import { getRecentContext, removeInternalInstructionMessages } from './conversation-context';
+import type { ChatMessage, ChatProviderInput, ChatProviderResponse } from '../types/chat.types';
 
 const LATEST_MESSAGE_INSTRUCTION = [
   'Answer the latest user message only.',
@@ -48,10 +48,14 @@ export class PrimaryGatewayProvider implements AiProvider {
 
     const data = await response.json() as { assistantText?: string; messages?: ChatProviderResponse['messages'] };
     if (!data.assistantText) throw new ProviderRequestError('Primary gateway returned an empty response');
+    const responseMessages: ChatMessage[] = data.messages
+      ? removeInternalInstructionMessages(data.messages)
+      : [...removeInternalInstructionMessages(input.messages), { role: 'user', content: input.message }, { role: 'assistant', content: data.assistantText }];
     return {
       message: data.assistantText,
       conversationId: input.conversationId,
-      messages: data.messages ?? [...input.messages, { role: 'user', content: input.message }, { role: 'assistant', content: data.assistantText }],
+      messages: responseMessages,
+      ai: { route: 'sdk', provider: input.model, model: input.model },
       source: 'sdk',
     };
   }

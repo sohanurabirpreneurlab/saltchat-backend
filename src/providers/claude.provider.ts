@@ -1,5 +1,5 @@
 import type { AiProvider } from './ai-provider.interface';
-import { getRecentContext } from './conversation-context';
+import { getRecentContext, removeInternalInstructionMessages } from './conversation-context';
 import type { ChatProviderInput, ChatProviderResponse } from '../types/chat.types';
 
 const LATEST_MESSAGE_INSTRUCTION = 'Answer only the latest user message. Use prior messages as context only when relevant; if the latest message is unrelated, ignore the earlier topic and answer it independently. Do not answer earlier questions again unless explicitly asked.';
@@ -36,7 +36,8 @@ export class ClaudeProvider implements AiProvider {
     return {
       message,
       conversationId: input.conversationId,
-      messages: [...input.messages, { role: 'user', content: input.message }, { role: 'assistant', content: message }],
+      messages: [...removeInternalInstructionMessages(input.messages), { role: 'user', content: input.message }, { role: 'assistant', content: message }],
+      ai: { route: 'direct', provider: 'claude', model: this.model },
     };
   }
 }

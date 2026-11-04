@@ -37,6 +37,7 @@ export function createChatController(service: ChatService): RequestHandler {
         message: result.message,
         conversation_id: result.conversationId,
         messages: result.messages,
+        ai: result.ai,
         source: result.source,
       });
     } catch (error) {

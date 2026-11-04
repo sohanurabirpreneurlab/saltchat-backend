@@ -47,6 +47,7 @@ describe('SaltChat API', () => {
         { role: 'user', content: 'How do I create a quote?' },
         { role: 'assistant', content: 'Mock response for: How do I create a quote?' },
       ],
+      ai: { route: 'mock', provider: 'gemini', model: 'gemini' },
     });
   });
 

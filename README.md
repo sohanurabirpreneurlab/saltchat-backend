@@ -76,6 +76,20 @@ curl -X POST http://localhost:3000/api/chat \
 
 The SaltHub backend must send `X-Service-Key` and must never expose that value to the browser. It does not need to send any provider key.
 
+Chat responses include an `ai` field so SaltHub can identify how the response was generated:
+
+```json
+{
+  "ai": {
+    "route": "sdk",
+    "provider": "gemini",
+    "model": "gemini"
+  }
+}
+```
+
+`route` is one of `sdk`, `direct`, `fallback`, or `mock`. For example, a direct Claude response uses `route: "direct"` and `provider: "claude"`; a Claude fallback uses `route: "fallback"`. The legacy `source` field remains available for SDK and fallback responses.
+
 ## Vercel deployment
 
 Import this repository into Vercel. The included `vercel.json` exposes `api/index.ts` as the function entrypoint. Configure the required environment variables in the Vercel project settings, especially `SERVICE_SECRET`; do not commit `.env`.

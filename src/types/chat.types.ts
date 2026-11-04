@@ -19,9 +19,18 @@ export interface ChatProviderInput {
   };
 }
 
+export type AiRoute = 'sdk' | 'direct' | 'fallback' | 'mock';
+
+export interface AiMetadata {
+  route: AiRoute;
+  provider: string;
+  model: string;
+}
+
 export interface ChatProviderResponse {
   message: string;
   conversationId: string | null;
   messages: ChatMessage[];
+  ai: AiMetadata;
   source?: 'sdk' | 'fallback';
 }
